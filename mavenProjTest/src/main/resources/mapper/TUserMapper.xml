@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.mapper.TUserMapper">
+
+    <resultMap id="BaseResultMap" type="org.example.dao.proj.TUser">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="userAge" column="user_age" jdbcType="INTEGER"/>
+        <result property="isDeleted" column="is_delete" jdbcType="BOOLEAN"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, user_name,
+        user_age, is_delete
+    </sql>
+
+    <select id="queryByAge" resultType="org.example.dao.proj.TUser">
+        SELECT *
+        FROM db_test.t_user
+        where user_age = #{userAge}
+          and is_deleted = 0
+    </select>
+
+</mapper>

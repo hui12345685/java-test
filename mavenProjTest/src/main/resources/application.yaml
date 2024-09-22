@@ -1,0 +1,181 @@
+server:
+  port: 9090
+spring:
+  application:
+    name: yyhtestmaven
+  threads:
+    virtual:
+      enabled: true
+  main:
+    keep-alive: true
+  cloud:
+    config:
+      enabled: false
+  data:
+    mongodb:
+      uri: mongodb://${mongo_username}:${mongo_password}@${mongo_host}/${test_mongo_database:db_test}?authSource=${mongo_auth_db}
+      host: ${mongo_host}
+      port: ${mongo_port:27017}
+      database: ${test_mongo_database:db_test}
+      username: ${mongo_username}
+      password: ${mongo_password}
+      dynamic-collections:
+        - collection: material
+          collectionNameStrategy: suffix
+          suffix-fields: bizId
+          locate-cluster-by: bizId
+          locate-cluster-field-name: bizId
+        - collection: material_label
+          collectionNameStrategy: suffix
+          suffix-fields: bizId
+          locate-cluster-by: bizId
+          locate-cluster-field-name: bizId
+        - collection: material_management_group_tree
+          collectionNameStrategy: suffix
+          suffix-fields: bizId
+          locate-cluster-by: bizId
+          locate-cluster-field-name: bizId
+    redis:
+      host: ${redis_host}
+      password: ${redis_auth}
+      port: ${redis_port}
+      lettuce:
+        pool:
+          min-idle: 5
+          max-active: 10
+          max-idle: 5
+          max-wait: -1
+      connect-timeout: 30000
+  datasource:
+    url: jdbc:mysql://${mysql_host}:${mysql_port}/db_wxwork_marketing?useUnicode=true&characterEncoding=utf8&useSSL=false&socketTimeout=30000&allowMultiQueries=true
+    username: ${mysql_username}
+    password: ${mysql_password}
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 5
+      max-active: 50
+      max-wait: 60000
+      min-evictable-idle-time-millis: 3600000
+      min-idle: 5
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      time-between-eviction-runs-millis: 60000
+      validation-query: SELECT 'x'
+      validation-query-timeout: 1000
+      keep-alive: true
+      default-timeout: 5000
+      jdbc-connect-timeout: 5000
+      jdbc-auto-reconnect: true
+
+  kafka:
+    bootstrap-servers: ${kafka_brokers}
+    listener:
+      ack-mode: manual
+    consumer:
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        session.timeout.ms: 15000
+        spring:
+          json:
+            trusted:
+              packages: '*'
+      crowd:
+        group_id: crowed_bitmap_transfer_task
+    producer:
+      retries: 0
+      batch-size: 16384
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        linger.ms: 1
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+scrm:
+  wxwork:
+    api:
+      server: ${wm_wxwork_gateway_domain:http://wm-wxwork-gateway:8080}/wxwork-api/
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 10000 # 连接超时时间，单位为毫秒
+        readTimeout: 10000 # 读取超时时间，单位为毫秒
+
+#配置企微导入时间限制
+test:
+  wxwork:
+    import:
+      limits:
+        group: 1000 # 1小时
+        user: 3600000 # 1小时
+        customer: 3600000 # 1小时
+        tag: 600000 # 10分钟
+
+common:
+  login:
+    fe:
+      ignore: /swagger/*,/actuator/*,/api/test/web/chat/active-code/h5-chat
+    parent:
+      cookie:
+        key: testBeaconUnionKey
+    data:
+      auth:
+        pubkey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu7qGURjk68d8iekaXNdvLyN43Vdana1y1uDs1EtLK1kx3eaoimL39agGtjTxmTH90y2fjV7omM6dFQwdc+1gPBpFlB+X/7uBQ22lugi3x9V9zF5/ukEfyl+uPEu4q7utOOG/UgeH44gsSkGSbOop5SzJeF00IsdK5cKTwoRzrc7TS+gE0m8Mbyf/WBcUtL9FAPottYxHRXGGG5iEFdPj0KmMaNs9pK5q32qCrWS0AAUGynHUAXSKwldEhgCsFQVk9IoVV/cscyHO38Zp8ByPHggw8CrPmAt0bHO2iq6xgFtXRYSfjkVV7XPiPUGaTZaPJr5EY2RDZcEevnlThmO9bQIDAQAB
+    feign:
+      ignore: /swagger,/inner-api/test/web/user/thread,/inner-api/test/web/nowxwork/*,/inner-api/test/agent/all-active
+
+data:
+  auth:
+    app:
+      key: ${data_auth_app_key_cdp:cdp}
+    secret:
+      key: ${data_auth_secret_key_cdp:xxx}
+    host: ${data_auth_server_domain}
+
+logging:
+  config: ${test_logging_config:classpath:log4j2.xml}
+
+mybatis-plus:
+  # xml文件位置
+  mapper-locations: mapper/*.xml
+  type-handlers-package: com.baomidou.mybatis3.alias,com.baomidou.mybatis3.domain
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
+management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: "*"
+  server:
+    port: 8081
+
+cdp_entity_domain: ${cdp_entity_domain}
+qd_analytics_engine_domain: ${qd_analytics_engine_domain}
+etl:
+  service:
+    url: ${qd_analytics_engine_domain}
+
+s3:
+  test-bucket: ${s3_bucket_test}
+  cos-region: ${minio_region}
+  cos-domain: ${minio_domain}
+  s3-type: ${s3_type}
+  path-style: false
+  access-key: ${minio_access_key}
+  secret-key: ${minio_secret_key}
+  endpoint: ${minio_endpoint}
+  # s3业务id 企微互动统一使用wxwork-marketing
+  s3-biz: wxwork-marketing
+  # 素材通用s3路径
+  s3-base-path: /test
+  # 通用s3路径
+  material-base-path: /material
+
