@@ -20,6 +20,7 @@ public class SimpleTestImplV2 extends SimpleTestImpl {
         return true;
     }
 
+    // 静态内部类
     @Data
     @ToString
     private static class TestClass{
